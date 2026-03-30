@@ -1,52 +1,43 @@
-# SCas4D: Structural Cascaded Optimization for Boosting Persistent 4D Novel View Synthesis
 
-Jipeng Lyu, Jiahua Dong, Yu-Xiong Wang  
-University of Illinois Urbana-Champaign
 
-<div class="text-left text-sm mt-4">
-
-**Structured dynamic optimization for fast and stable 4DGS**
-
+<div style="text-align: center; margin-top: -30px; margin-bottom: 12px;">
+  <img src="/src/icon.svg" style="height: 30px; display: inline-block;" />
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
+<h1 style="font-size: 3.1rem; line-height: 1.3; text-align: center;">SCas4D: Structural Cascaded Optimization for Boosting Persistent 4D Novel View Synthesis</h1>
 
-<b>[Image Placeholder #T1]</b><br><br>
-Use a clean teaser crop or one strong visual from the paper.
-
-</div>
+<h1 style="font-size: 1.2rem; line-height: 1.3; text-align: center;">Jipeng Lyu, Jiahua Dong, Yu-Xiong Wang</h1>
+<h1 style="font-size: 1.2rem; line-height: 0.3; text-align: center;">University of Illinois Urbana-Champaign</h1>
 
 <!--
-Hello everyone, thank you for coming.
-I am very happy to present our work SCas4D.
+Hello everyone, I am very happy to present our work SCas4D.
 In this talk, I will show how adding structure to dynamic Gaussian optimization
 makes online 4D novel view synthesis much faster and more stable.
 -->
 
 ---
 
-# Online 4DGS Needs to Adapt Fast
+# Online 4DGS: Fast Adaptation
 
 <div class="text-left text-sm">
 
-- each frame starts from the previous one
-- motion can be large and highly non-rigid
-- low iteration budget makes optimization hard
+- Each frame starts from the previous one
+- Motion can be large and highly non-rigid
+- Low iteration budget makes optimization hard
 
 </div>
 
-<div class="text-left text-base mt-4">
 
-**Can we make dynamic 4DGS converge faster and more stably?**
-
-</div>
-
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Video Placeholder #M1]</b><br><br>
-Short motivating clip of a challenging dynamic scene.  
-No comparison needed yet.
-
+<div class="flex" style="width: 100%; margin-top: 16px;">
+  <div style="width: 30%;">
+    <img src="/src/video_output/gt_robot_3.gif" style="width: 100%; display: block;" />
+  </div>
+  <div style="width: 30%;">
+    <img src="/src/video_output/gt_cloth_0.gif" style="width: 100%; display: block;" />
+  </div>
+  <div style="width: 40%; display: flex; align-items: center;">
+    <img src="/src/video_output/gt_football_1.gif" style="width: 100%; display: block;" />
+  </div>
 </div>
 
 <!--
@@ -60,29 +51,40 @@ and the optimization budget per frame is very limited.
 
 ---
 
-# Problem: Low-Budget Online Optimization is Unstable
+# Problem: Optimization Instability
 
 <div class="text-left text-sm">
 
-- standard methods update Gaussians largely independently
-- under a small budget, optimization can drift or collapse
-- this becomes worse for large motion and non-rigid deformation
+- Standard methods update Gaussians independently
+- Under small budget, optimization drifts or collapses
+- Worsens for large motion and non-rigid deformation
 
 </div>
 
-<div class="text-left text-base mt-4">
 
-**Low budget → drift, collapse, and poor rendering quality**
-
+<div class="flex" style="width: 100%; height: 38vh; margin-top: 16px;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_cloth_0.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_cloth_0.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0; display: flex; align-items: center;">
+      <img src="/src/video_output/gt_cloth_0.gif" style="width: 100%; height: auto; object-fit: contain; display: block;" />
+    </div>
+  </div>
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Video Placeholder #P1]</b><br><br>
-Failure case under 100 it/frame.  
-Recommended scenes: Robot or Cloth.  
-Show Ours vs Dynamic3DGS vs GT if possible.
-
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
 </div>
 
 <!--
@@ -94,27 +96,17 @@ especially for large motion and non-rigid deformation.
 
 ---
 
-# Key Insight: Deformation is Structured
+# Key Insight: Structured Deformation
 
 <div class="text-left text-sm">
 
-Instead of updating each Gaussian independently,  
-we optimize motion in a **coarse-to-fine structured way**.
-
-- nearby Gaussians often move together
-- large structures should move first
-- local details can be refined later
+- Nearby Gaussians share motion patterns
+- Large structures move first, details refined later
+- Coarse-to-fine instead of independent per-point updates
 
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #K1]</b><br><br>
-Concept figure:  
-Left = independent per-Gaussian motion  
-Right = hierarchical clustered motion from coarse to fine
-
-</div>
+<img src="/src/K1_0.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
 <!--
 The core insight is that dynamic deformation is not arbitrary.
@@ -127,29 +119,40 @@ instead of a fully unstructured one.
 
 ---
 
-# SCas4D: Structural Cascaded Optimization
+# Key Insight: Structured Deformation
 
 <div class="text-left text-sm">
 
-- organize Gaussians into **K-layer clusters**
-- each layer has a deformation function
-- compose them from coarse to fine
+- Nearby Gaussians share motion patterns
+- Large structures move first, details refined later
+- Coarse-to-fine instead of independent per-point updates
 
 </div>
 
-<div class="text-left text-base mt-4">
+<img src="/src/K1_1.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
-**D = D₁ ∘ D₂ ∘ ... ∘ Dₖ**
+<!--
+The core insight is that dynamic deformation is not arbitrary.
+Many Gaussians share motion patterns,
+so it is more natural to move them as groups first,
+and then refine locally.
+This gives us a structured optimization problem
+instead of a fully unstructured one.
+-->
+
+---
+
+# Method: SCas4D
+
+<div class="text-left text-sm">
+
+- Organize Gaussians into **K-layer clusters**
+- Each layer has a deformation function
+- Compose from coarse to fine
 
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #P2]</b><br><br>
-Pipeline overview:  
-previous-frame Gaussians → K-layer cluster structure → deformation → rendering → backpropagation
-
-</div>
+<img src="/src/P2.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
 <!--
 Starting from the Gaussians of the previous frame,
@@ -161,30 +164,19 @@ The whole model is supervised through the rendered image loss.
 
 ---
 
-# Interpretable Cluster Deformation
+# Cluster Deformation
 
 <div class="text-left text-sm">
+<!-- 
+For each cluster, we model: -->
 
-For each cluster, we model:
-
-- rotation
-- translation
-- position-dependent scaling
-
-</div>
-
-<div class="text-left text-base mt-4">
-
-**Stable, expressive, and easy to optimize**
+- Rotation
+- Translation
+- Position-dependent scaling
 
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #D1]</b><br><br>
-Use the figure that visualizes rotation / translation / scaling on one cluster.
-
-</div>
+<img src="/src/P2.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
 <!--
 A cluster deformation is parameterized in an interpretable way:
@@ -196,28 +188,17 @@ than unconstrained per-point motion.
 
 ---
 
-# Coarse Structure + Fine Residual Freedom
+# Coarse-to-Fine Hierarchy
 
 <div class="text-left text-sm">
 
-- coarse layers align large structures quickly
-- fine layers refine smaller local motion
-- per-Gaussian residuals preserve detail
+- Coarse layers align large structures quickly
+- Fine layers refine smaller local motion
+- Per-Gaussian residuals preserve detail
 
 </div>
 
-<div class="text-left text-base mt-4">
-
-**Fast convergence without sacrificing fidelity**
-
-</div>
-
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #H1]</b><br><br>
-Hierarchy visualization across layers, or a custom three-level diagram.
-
-</div>
+<img src="/src/P2.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
 <!--
 An important point is that we do not lose fine-grained modeling power.
@@ -229,28 +210,17 @@ without over-constraining the representation.
 
 ---
 
-# End-to-End Optimization Through Rendering
+# End-to-End via Rendering
 
 <div class="text-left text-sm">
 
-- deform Gaussians for the current frame
-- render the image
-- backpropagate image loss
+- Deform Gaussians for the current frame
+- Render the image
+- Backpropagate image loss
 
 </div>
 
-<div class="text-left text-base mt-4">
-
-**Minimal change to the online 4DGS pipeline**
-
-</div>
-
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #G1]</b><br><br>
-Pipeline page with gradient flow annotation.
-
-</div>
+<img src="/src/G1.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
 <!--
 After deformation, we render the current frame
@@ -262,77 +232,235 @@ into a much more structured one.
 
 ---
 
-# Main Result: Much Better Quality at 100 it/frame
+# Results: Quality at 100 it/frame
 
-<div class="text-left text-sm">
+<div class="text-center font-semibold mt-10 mb-6" style="font-size: 1.1rem;">Robot</div>
 
-- clearly better than Dynamic3DGS under the same budget
-- close to the quality of much longer optimization
-- more stable structure and less drift
-
+<div class="flex" style="width: 100%; height: 38vh;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_robot_3.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_robot_3.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/gt_robot_3.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Video Placeholder #R1]</b><br><br>
-Main qualitative comparison.  
-Recommended: one synthetic scene + one real scene.  
-Examples: Cloth + Football, or Robot + Boxes.
-
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
 </div>
 
 <!--
-This is the main takeaway.
 Under the same low iteration budget of 100 iterations per frame,
 our method is consistently more stable than the baseline.
-Qualitatively, we see better structure preservation,
-less drift, and cleaner deformation.
 -->
 
 ---
 
-# Quantitative Result: 100 it/frame is Enough
+# Results: Quality at 100 it/frame
 
-<div class="text-left text-sm">
+<div class="text-center font-semibold mt-10 mb-6" style="font-size: 1.1rem;">Cloth</div>
 
-- outperform baseline at the same iteration budget
-- approach the quality of much longer baseline optimization
-- significant iteration-level convergence speedup
-
+<div class="flex" style="width: 100%; height: 38vh;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_cloth_0.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_cloth_0.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/gt_cloth_0.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #Q1]</b><br><br>
-Clean crop of the main quantitative table.  
-Optional: add the convergence curve as a side panel.
-
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
 </div>
 
 <!--
-Quantitatively, SCas4D significantly outperforms the baseline
-under the same 100-iteration budget,
-and approaches the quality reached by much longer baseline optimization.
-So the key claim is not just better final quality,
-but much faster convergence in the online setting.
+Under the same low iteration budget of 100 iterations per frame,
+our method is consistently more stable than the baseline.
 -->
 
 ---
 
-# Extra Benefit: Better Tracking
+# Results: Quality at 100 it/frame
+
+<div class="text-center font-semibold mt-10 mb-6" style="font-size: 1.1rem;">Spring</div>
+
+<div class="flex" style="width: 100%; height: 38vh;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_spring_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_spring_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/gt_spring_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+</div>
+
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
+</div>
+
+<!--
+Under the same low iteration budget of 100 iterations per frame,
+our method is consistently more stable than the baseline.
+-->
+
+---
+
+# Results: Quality at 100 it/frame
+
+<div class="text-center font-semibold mt-10 mb-6" style="font-size: 1.1rem;">Football</div>
+
+<div class="flex" style="width: 100%; height: 38vh;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_football_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_football_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/gt_football_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+</div>
+
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
+</div>
+
+<!--
+Under the same low iteration budget of 100 iterations per frame,
+our method is consistently more stable than the baseline.
+-->
+
+---
+
+# Results: Quality at 100 it/frame
+
+<div class="text-center font-semibold mt-10 mb-6" style="font-size: 1.1rem;">Boxes</div>
+
+<div class="flex" style="width: 100%; height: 38vh;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_boxes_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_boxes_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/gt_boxes_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+</div>
+
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
+</div>
+
+<!--
+Under the same low iteration budget of 100 iterations per frame,
+our method is consistently more stable than the baseline.
+-->
+
+---
+
+# Results: Quality at 100 it/frame
+
+<div class="text-center font-semibold mt-10 mb-6" style="font-size: 1.1rem;">Softball</div>
+
+<div class="flex" style="width: 100%; height: 38vh;">
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ours</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/ours_softball_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Dynamic3DGS</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/deva_softball_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+  <div class="flex flex-col" style="width: 33.33%;">
+    <div class="text-center" style="font-size: 0.95rem; line-height: 0.;">Ground Truth</div>
+    <div style="flex: 1; min-height: 0;">
+      <img src="/src/video_output/gt_softball_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+    </div>
+  </div>
+</div>
+
+<div style="position: absolute; bottom: 16px; left: 24px; right: 24px; font-size: 0.6rem; color: #888;">
+Luiten, Jonathon, et al. "Dynamic 3d gaussians: Tracking by persistent dynamic view synthesis." arXiv preprint arXiv:2308.09713 (2023).
+</div>
+
+<!--
+Under the same low iteration budget of 100 iterations per frame,
+our method is consistently more stable than the baseline.
+-->
+
+---
+
+# Better Tracking
 
 <div class="text-left text-sm">
 
-- more stable and coherent motion
-- more accurate dense point trajectories
+- More stable and coherent motion
+- More accurate dense point trajectories
 
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
+<img src="/src/T2.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
-<b>[Image Placeholder #T2]</b><br><br>
-Tracking figure with trajectory comparison.
-
+<div class="text-center mt-2" style="font-size: 0.8rem; color: #555;">
+Left: Comparing our tracking result (blue) to the ground truth (red). Right: Visualization of our tracking results.
 </div>
 
 <!--
@@ -343,21 +471,26 @@ In the paper we show that this leads to better dense point tracking as well.
 
 ---
 
-# Extra Benefit: Self-supervised Articulated Segmentation
+# Self-supervised Segmentation
 
 <div class="text-left text-sm">
 
-- cluster motion across time
-- recover motion-consistent parts
-- no semantic labels required
+- Cluster motion across time
+- Recover motion-consistent parts
+- No semantic labels required
 
 </div>
 
-<div style="width: 100%; height: 300px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Video Placeholder #S1]</b><br><br>
-Segmentation result from the supplemental material.
-
+<div class="flex items-center" style="width: 100%; margin-top: 20px; height: 42vh;">
+  <div style="width: 38%; height: 100%; display: flex; align-items: center;">
+    <img src="/src/video_output/gt_boxes_1.gif" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+  </div>
+  <div style="width: 24%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #444;">
+    <span style="display: inline-block; transform: scaleX(3); transform-origin: center;">→</span>
+  </div>
+  <div style="width: 38%; height: 100%; display: flex; align-items: center;">
+    <img src="/src/S1_boxes.png" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+  </div>
 </div>
 
 <!--
@@ -374,35 +507,18 @@ which gives a useful segmentation signal without semantic annotation.
 
 <div class="text-left text-sm">
 
-SCas4D turns online 4DGS optimization from  
-**independent point updates** into  
-**structured cascaded deformation**.
+- Independent → **structured cascaded deformation**
+- Faster convergence under low iteration budget
+- More stable rendering quality
+- Motion cues for tracking & segmentation
 
 </div>
 
-<div class="text-left text-sm mt-4">
+<img src="/src/C1.png" style="display: block; width: 72%; margin: 16px auto 0;" />
 
-This gives:
-
-- faster convergence
-- more stable rendering
-- useful motion cues for downstream tasks
-
-</div>
-
-<div class="text-left text-base mt-4">
-
-**Please check out our paper for more details.**
-
-</div>
-
-<div style="width: 100%; height: 240px; border: 2px dashed rgb(102,102,102); padding: 16px; border-radius: 8px; overflow: auto; margin-top: 20px;">
-
-<b>[Image Placeholder #C1]</b><br><br>
-Closing summary visual.  
-Option A: reuse teaser image  
-Option B: three thumbnails for rendering, tracking, segmentation
-
+<div class="text-center mt-4" style="font-size: 0.95rem;">
+  Please check out our paper for more details —
+  <a href="https://arxiv.org/pdf/2510.06694" target="_blank" style="color: #4a90d9;">arxiv.org/pdf/2510.06694</a>
 </div>
 
 <!--

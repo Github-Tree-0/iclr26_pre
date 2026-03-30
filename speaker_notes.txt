@@ -1,0 +1,130 @@
+=== Slide 1: Title ===
+Hello everyone, I'm very happy to present our work, SCas4D.
+In this talk, I'll show how introducing structure into dynamic Gaussian optimization
+makes online 4D novel view synthesis significantly faster and more stable.
+
+=== Slide 2: Online 4DGS: Fast Adaptation ===
+Let me first set up the problem.
+We work in the online persistent 4D novel view synthesis setting.
+At each new frame, we start from the Gaussians of the previous frame
+and need to quickly adapt them to match the new observations.
+This is challenging for three reasons.
+First, each frame inherits the state of the previous one, so errors can accumulate.
+Second, motion can be large and highly non-rigid.
+And third, we have a very limited iteration budget per frame,
+so the optimization has to be both fast and accurate.
+
+=== Slide 3: Problem: Optimization Instability ===
+The core problem is that existing methods like Dynamic3DGS
+update each Gaussian largely independently.
+Under a small per-frame iteration budget, this leads to unstable optimization —
+individual Gaussians can drift in inconsistent directions, or the structure can collapse entirely.
+As you can see here, the baseline produces blurry or broken results,
+while our method stays close to the ground truth.
+This problem gets especially severe for large motion and non-rigid deformation.
+
+=== Slide 4: Key Insight: Structured Deformation (step 1) ===
+So what's the key insight?
+The observation is that real-world deformation is not arbitrary.
+Nearby Gaussians tend to move together —
+a robot arm moves as a whole, a piece of cloth folds coherently.
+This means we don't need to treat every Gaussian independently.
+Instead, we can model motion in a structured way,
+handling large-scale movement first,
+and then refining local details afterward.
+
+=== Slide 5: Key Insight: Structured Deformation (step 2) ===
+Concretely, we propose to organize Gaussians into groups
+and move them in a coarse-to-fine manner.
+As shown in the figure, instead of independent per-point updates on the left,
+we get hierarchical group-level motion on the right.
+This structure makes optimization much more stable,
+because each group of Gaussians is constrained to move coherently.
+
+=== Slide 6: Method: SCas4D ===
+This idea leads to our method, SCas4D.
+Starting from the Gaussians of the previous frame,
+we organize them into a K-layer cluster hierarchy.
+Each layer defines a deformation function,
+and the full scene deformation is the composition of all layers from coarse to fine —
+D1 composed with D2, all the way to Dk.
+The whole model is supervised end-to-end through the rendered image loss.
+
+=== Slide 7: Cluster Deformation ===
+For each cluster, we model three components:
+rotation, translation, and position-dependent scaling.
+This parameterization is interpretable and expressive enough
+to capture the major motion patterns in dynamic scenes,
+while being much easier to optimize than unconstrained per-point motion.
+
+=== Slide 8: Coarse-to-Fine Hierarchy ===
+An important property of our hierarchy is that
+we don't sacrifice fine-grained modeling power for the sake of structure.
+The coarse layers quickly align large-scale structures across frames,
+the finer layers handle smaller local motion,
+and per-Gaussian residuals on top preserve fine details.
+So the hierarchy speeds up convergence without over-constraining the representation.
+
+=== Slide 9: End-to-End via Rendering ===
+The full pipeline is straightforward.
+We deform the Gaussians using the cascaded cluster hierarchy,
+render the deformed scene, and backpropagate through the image loss.
+SCas4D fits naturally into the existing online 4DGS framework —
+the only change is replacing independent per-Gaussian updates
+with our structured cascaded deformation.
+
+=== Slide 10: Results — Robot ===
+Now let's look at qualitative results.
+Here is the Robot scene.
+On the left is our method, in the middle is Dynamic3DGS, and on the right is ground truth.
+Both use the same 100 iterations per frame.
+You can see that our method produces much cleaner and more stable results,
+while the baseline shows visible artifacts and structural drift.
+
+=== Slide 11: Results — Cloth ===
+Here is the Cloth scene, which involves large non-rigid deformation.
+Our method closely matches the ground truth,
+while the baseline struggles to track the fast-moving fabric.
+
+=== Slide 12: Results — Spring ===
+The Spring scene features a highly elastic object undergoing significant stretching.
+Our structured deformation handles this well,
+whereas the baseline loses shape consistency under the same budget.
+
+=== Slide 13: Results — Football ===
+In the Football scene, we have fast-moving objects with complex trajectories.
+Our method maintains coherent structure throughout the sequence.
+
+=== Slide 14: Results — Boxes ===
+Here is the Boxes scene with multiple rigid objects moving simultaneously.
+Our method correctly tracks each object,
+while the baseline tends to confuse motion across objects.
+
+=== Slide 15: Results — Softball ===
+Finally, the Softball scene.
+Even for this small fast-moving object,
+our structured deformation converges more reliably than the baseline.
+
+=== Slide 16: Better Tracking ===
+Beyond rendering quality, our stable deformation field also benefits downstream tasks.
+Because the method produces more coherent per-Gaussian motion,
+it can be directly used for dense point tracking.
+As shown here, our tracking trajectories in blue are much closer to the ground truth in red,
+and the visualization on the right shows clean, consistent motion paths across the sequence.
+
+=== Slide 17: Self-supervised Segmentation ===
+Another nice byproduct of our structured deformation is self-supervised segmentation.
+By clustering the learned motion parameters over time,
+we can automatically recover motion-consistent parts of the scene —
+without any semantic labels.
+On the left is the input video, and on the right you can see
+that our method correctly separates the moving boxes into distinct segments.
+
+=== Slide 18: Takeaway ===
+To summarize, SCas4D replaces independent per-Gaussian updates
+with structured cascaded deformation.
+This simple change gives faster convergence under a low iteration budget,
+more stable rendering quality,
+and useful motion cues for both tracking and segmentation.
+If you're interested in more details, please check out our paper.
+Thank you very much.
